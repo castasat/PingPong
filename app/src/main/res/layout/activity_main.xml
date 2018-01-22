@@ -7,7 +7,8 @@
     android:background="#FFF"
     tools:context="com.openyogaland.denis.pingpong.MainActivity">
 
-    <com.openyogaland.denis.circles.CanvasView
+    <com.openyogaland.denis.pingpong.CanvasView
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+    
 </LinearLayout>
