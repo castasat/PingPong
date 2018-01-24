@@ -4,21 +4,14 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
-import android.graphics.Point;
 import android.util.AttributeSet;
-import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Toast;
 
-//this class is a View, on which we can draw something
+// this class is a View, on which we can draw something
 public class CanvasView extends View implements ICanvasView
 {
-  // константы
-  private static int screenWidth;  // ширина экрана
-  private static int screenHeight; // высота экрана
-  
   // поля
   private Paint  paint;  // "кисточка" для рисования
   private Canvas canvas; // "холст" для рисования
@@ -30,44 +23,24 @@ public class CanvasView extends View implements ICanvasView
   public CanvasView(Context context, AttributeSet attrs)
   {
     super(context, attrs);
-    initWidthAndHeight(context); // инициализируем ширину и высоту экрана
-    initPaint();                 // инициализируем "кисточку"
-    gameController = new GameController(this, screenWidth, screenHeight);
-  }
-  
-  // инициализируем ширину и высоту экрана
-  private void initWidthAndHeight(Context context)
-  {
-    WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-    if(windowManager != null)
-    {
-      Display display = windowManager.getDefaultDisplay();
-      Point   point   = new Point();
-      display.getSize(point); // точка приобретает координаты правой нижней точки экрана
-      screenWidth  = point.x;
-      screenHeight = point.y;
-    }
+    initPaint(); // инициализируем "кисточку"
+    gameController = new GameController(this, context);
   }
   
   // инициализируем "кисточку"
   private void initPaint()
   {
     paint = new Paint();
-    paint.setAntiAlias(true);   // сглаживание
-    paint.setStyle(Style.FILL); // заливка
+    paint.setAntiAlias(true); // сглаживание
   }
   
-  // метод интерфейса ICanvasView
+  // method onDraw()
   @Override
-  public void showMessage(String text)
+  protected void onDraw(Canvas canvas)
   {
-    if(toast != null) // если всплывающее сообщение на экране
-    {
-      toast.cancel();
-    }
-    toast = Toast.makeText(getContext(), text, Toast.LENGTH_SHORT);
-    toast.setGravity(Gravity.CENTER, 0, 0);
-    toast.show();
+    super.onDraw(canvas);
+    this.canvas = canvas;
+    gameController.onDraw();
   }
   
   // метод интерфейса ICanvasView
@@ -79,15 +52,44 @@ public class CanvasView extends View implements ICanvasView
   
   // метод интерфейса ICanvasView
   @Override
-  public void drawCircle()
+  public void drawTable(int screenWidth, int screenHeight, int borderMargin, int borderWidth, int color)
   {
-  
+    paint.setStyle(Style.STROKE); // обводка
+    paint.setStrokeWidth(borderWidth);
+    paint.setColor(color);
+    canvas.drawRect(borderMargin, borderMargin, (screenWidth - borderMargin),
+        (screenHeight - borderMargin), paint);
+    canvas.drawLine(screenWidth / 2, borderMargin, screenWidth / 2, (screenHeight - borderMargin),
+        paint);
   }
   
   // метод интерфейса ICanvasView
   @Override
-  public void drawRectahgle()
+  public void drawRacket(Racket racket)
   {
+    paint.setStyle(Style.FILL); // заполнение
+    paint.setColor(racket.getColor());
+    canvas.drawRect(racket.getRect(), paint);
+  }
   
+  // метод интерфейса ICanvasView
+  @Override
+  public void drawBall(Ball ball)
+  {
+    paint.setStyle(Style.FILL); // заполнение
+    paint.setColor(ball.getColor());
+    canvas.drawCircle(ball.getX(), ball.getY(), ball.getRadius(), paint);
+  }
+  
+  // метод интерфейса ICanvasView
+  @Override public void showMessage(String text)
+  {
+    if(toast != null) // если всплывающее сообщение на экране
+    {
+      toast.cancel();
+    }
+    toast = Toast.makeText(getContext(), text, Toast.LENGTH_SHORT);
+    toast.setGravity(Gravity.CENTER, 0, 0);
+    toast.show();
   }
 }

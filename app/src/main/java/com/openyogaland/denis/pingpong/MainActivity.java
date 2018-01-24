@@ -8,6 +8,8 @@ import android.view.WindowManager.LayoutParams;
 
 public class MainActivity extends AppCompatActivity
 {
+  // fields
+  CanvasView canvasView;
   
   @Override
   protected void onCreate(Bundle savedInstanceState)

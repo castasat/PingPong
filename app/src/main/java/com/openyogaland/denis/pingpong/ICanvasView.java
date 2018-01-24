@@ -3,9 +3,11 @@ package com.openyogaland.denis.pingpong;
 // Interface to work with from GameManager
 interface ICanvasView
 {
-  void drawCircle();
+  void drawTable(int screenWidth, int screenHeight, int borderMargin, int borderWidth, int color);
   
-  void drawRectahgle();
+  void drawRacket(Racket racket);
+  
+  void drawBall(Ball ball);
   
   void showMessage(String text);
   
