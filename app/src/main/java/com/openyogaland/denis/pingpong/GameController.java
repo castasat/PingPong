@@ -13,8 +13,12 @@ class GameController
   private int screenHeight; // высота экрана
  
   // parameters
-  private int borderMargin = 35; // отступ рамки от края экрана
-  private int borderWidth  = 5;  // толщина линии рамки стола
+  private int borderMargin  = 35;  // отступ рамки от края экрана
+  private int borderWidth   = 5;   // толщина линии рамки стола
+  private int racketPadding = 30;  // отступ ракетки от края рамки стола
+  private int ballRadius    = 15;  // радиус мяча
+  private int racketWidth   = 30;  // ширина ракетки
+  private int racketHeight  = 210; // высота ракетки
   
   // fields
   private CanvasView     canvasView;     // View, on which we can draw something
@@ -43,19 +47,25 @@ class GameController
     }
   }
   
-  // TODO
+  // opponent racket initialization
   private void initOpponentRacket()
   {
+    opponentRacket = new OpponentRacket(screenWidth - borderMargin - borderWidth - racketPadding
+        - racketWidth,(screenHeight-racketHeight)/2, racketWidth, racketHeight, Color.YELLOW);
   }
   
-  // TODO
+  // player racket initialization
   private void initPlayerRacket()
   {
+    playerRacket = new PlayerRacket(borderMargin + racketPadding, (screenHeight-racketHeight)/2,
+        racketWidth, racketHeight, Color.BLUE);
   }
   
-  // TODO
+  // ping-pong ball initialization
   private void initBall()
   {
+    ball = new Ball(borderMargin + racketPadding + racketWidth + ballRadius,
+        screenHeight/2, ballRadius, Color.WHITE);
   }
   
   // This method draws game scene on CanvasView
@@ -65,5 +75,10 @@ class GameController
     canvasView.drawRacket(opponentRacket);
     canvasView.drawRacket(playerRacket);
     canvasView.drawBall(ball);
+  }
+  
+  // TODO
+  void onTouchEvent(int x, int y)
+  {
   }
 }

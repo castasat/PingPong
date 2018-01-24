@@ -6,6 +6,7 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.util.AttributeSet;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
@@ -91,5 +92,32 @@ public class CanvasView extends View implements ICanvasView
     toast = Toast.makeText(getContext(), text, Toast.LENGTH_SHORT);
     toast.setGravity(Gravity.CENTER, 0, 0);
     toast.show();
+  }
+  
+  // Метод для обработки прикосновения к экрану
+  @Override
+  public boolean onTouchEvent(MotionEvent motionEvent)
+  {
+    // получаем координаты касания
+    int x = (int) motionEvent.getX();
+    int y = (int) motionEvent.getY();
+    
+    if(motionEvent.getAction() == MotionEvent.ACTION_MOVE)
+    {
+      gameController.onTouchEvent(x, y);
+      invalidate(); // нужно, чтобы у объекта View обновилось положение
+    }
+    if(motionEvent.getAction() == MotionEvent.ACTION_DOWN)
+    {
+      performClick(); // this is a good practice for accessibility
+    }
+    return true;
+  }
+  
+  // this is a good practice for accessibility
+  @Override
+  public boolean performClick()
+  {
+    return super.performClick();
   }
 }

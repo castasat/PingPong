@@ -1,7 +1,7 @@
 package com.openyogaland.denis.pingpong;
 
 // this class represents a ping-pong ball
-public class Ball
+class Ball
 {
   // fields
   private int x;
@@ -9,31 +9,33 @@ public class Ball
   private int radius;
   private int color;
   
-  // setter setColor()
-  public void setColor(int color)
+  // constructor
+  Ball(int x, int y, int radius, int color)
   {
-    this.color = color;
+    this.x      = x;
+    this.y      = y;
+    this.radius = radius;
+    this.color  = color;
   }
   
   // getter getX()
-  public int getX()
+  int getX()
   {
     return x;
   }
   // getter getY()
-  public int getY()
+  int getY()
   {
     return y;
   }
   // getter getRadius()
-  public int getRadius()
+  int getRadius()
   {
     return radius;
   }
   // getter getColor()
-  public int getColor()
+  int getColor()
   {
     return color;
   }
-
 }

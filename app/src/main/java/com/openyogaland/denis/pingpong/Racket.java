@@ -3,7 +3,7 @@ package com.openyogaland.denis.pingpong;
 import android.graphics.Rect;
 
 // This class represents a common ping-pong racket
-public class Racket
+class Racket
 {
   // fields
   private int x;
@@ -14,47 +14,40 @@ public class Racket
   private Rect rect;
   
   // constructor
-  Racket(int x, int y, int width, int height)
+  Racket(int x, int y, int width, int height, int color)
   {
     this.x = x;
     this.y = y;
     this.width  = width;
     this.height = height;
+    this.color  = color;
     
     rect = new Rect();
     rect.set(x, y, x + width, y + height);
   }
-  
-  // TODO check intersection of ball and racket
-  
-  // setter setColor()   
-  public void setColor(int color)
-  {
-    this.color = color;
-  }
-  
+ 
   // getter getX()
-  public int getX()
+  int getX()
   {
     return x;
   }
   // getter getY()
-  public int getY()
+  int getY()
   {
     return y;
   }
   // getter getWidth()
-  public int getWidth()
+  int getWidth()
   {
     return width;
   }
   // getter getHeight()
-  public int getHeight()
+  int getHeight()
   {
     return height;
   }
   // getter getColor()
-  public int getColor()
+  int getColor()
   {
     return color;
   }
@@ -62,5 +55,33 @@ public class Racket
   Rect getRect()
   {
     return rect;
+  }
+  
+  // check if the ball is touching the X coordinate of the racket
+  private boolean isTouchingX(Ball ball)
+  {
+    // модуль разности между координатами X мяча и ракетки меньше или равен радиусу мяча
+    return Math.abs(ball.getX() - this.getX()) <= ball.getRadius();
+  }
+  
+  // check if the ball is touching the Y coordinate of the racket
+  private boolean isTouchingY(Ball ball)
+  {
+    // координата Y мяча + радиус мяча больше или равна minY ракетки
+    // координата Y мяча - радиус мяча меньше или равна maxY ракетки
+    return ball.getY() + ball.getRadius() >= this.getY()
+           && ball.getY() - ball.getRadius() <= this.getY() + this.getHeight();
+  }
+  
+  // check if the ball is touching the racket
+  boolean isTouching(Ball ball)
+  {
+    return isTouchingX(ball) && isTouchingY(ball);
+  }
+  
+  // check if the racket misses the ball
+  boolean isMissing(Ball ball)
+  {
+    return isTouchingX(ball) && !isTouchingY(ball);
   }
 }
