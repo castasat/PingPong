@@ -25,7 +25,18 @@ class Racket
     rect = new Rect();
     rect.set(x, y, x + width, y + height);
   }
- 
+  
+  // setter setX()
+  void setX(int x)
+  {
+    this.x = x;
+  }
+  // setter setY()
+  void setY(int y)
+  {
+    this.y = y;
+  }
+  
   // getter getX()
   int getX()
   {
@@ -54,6 +65,7 @@ class Racket
   // getter getRect()
   Rect getRect()
   {
+    rect.set(x, y, x + width, y + height);
     return rect;
   }
   

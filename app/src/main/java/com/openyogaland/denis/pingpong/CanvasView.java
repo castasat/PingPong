@@ -15,7 +15,7 @@ public class CanvasView extends View implements ICanvasView
 {
   // поля
   private Paint  paint;  // "кисточка" для рисования
-  private Canvas canvas; // "холст" для рисования
+  Canvas canvas; // "холст" для рисования
   
   private GameController gameController; // "логика" игры
   private Toast          toast;          // всплывающее сообщение
@@ -62,6 +62,7 @@ public class CanvasView extends View implements ICanvasView
         (screenHeight - borderMargin), paint);
     canvas.drawLine(screenWidth / 2, borderMargin, screenWidth / 2, (screenHeight - borderMargin),
         paint);
+    redraw();
   }
   
   // метод интерфейса ICanvasView
@@ -71,6 +72,7 @@ public class CanvasView extends View implements ICanvasView
     paint.setStyle(Style.FILL); // заполнение
     paint.setColor(racket.getColor());
     canvas.drawRect(racket.getRect(), paint);
+    redraw();
   }
   
   // метод интерфейса ICanvasView
@@ -80,6 +82,7 @@ public class CanvasView extends View implements ICanvasView
     paint.setStyle(Style.FILL); // заполнение
     paint.setColor(ball.getColor());
     canvas.drawCircle(ball.getX(), ball.getY(), ball.getRadius(), paint);
+    redraw();
   }
   
   // метод интерфейса ICanvasView
@@ -105,16 +108,20 @@ public class CanvasView extends View implements ICanvasView
     if(motionEvent.getAction() == MotionEvent.ACTION_MOVE)
     {
       gameController.onTouchEvent(x, y);
-      invalidate(); // нужно, чтобы у объекта View обновилось положение
+      redraw(); // нужно, чтобы у объекта View обновилось положение
     }
     if(motionEvent.getAction() == MotionEvent.ACTION_DOWN)
     {
-      performClick(); // this is a good practice for accessibility
+      performClick();
+    }
+    if(motionEvent.getAction() == MotionEvent.ACTION_UP)
+    {
+      gameController.playerServe();
     }
     return true;
   }
   
-  // this is a good practice for accessibility
+  // for accessibility
   @Override
   public boolean performClick()
   {

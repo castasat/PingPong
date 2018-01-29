@@ -9,6 +9,10 @@ class Ball
   private int radius;
   private int color;
   
+  // flags
+  boolean isMovingLeft;
+  boolean isServed;
+  
   // constructor
   Ball(int x, int y, int radius, int color)
   {
@@ -16,6 +20,9 @@ class Ball
     this.y      = y;
     this.radius = radius;
     this.color  = color;
+    
+    isMovingLeft = false;
+    isServed     = false;
   }
   
   // getter getX()
@@ -37,5 +44,16 @@ class Ball
   int getColor()
   {
     return color;
+  }
+  
+  // setter setX()
+  void setX(int x)
+  {
+    this.x = x;
+  }
+  // setter setY()
+  void setY(int y)
+  {
+    this.y = y;
   }
 }

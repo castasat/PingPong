@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager.LayoutParams;
 
+import java.lang.reflect.Method;
+
 public class MainActivity extends AppCompatActivity
 {
   // fields
