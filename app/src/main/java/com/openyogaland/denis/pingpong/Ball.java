@@ -1,28 +1,42 @@
 package com.openyogaland.denis.pingpong;
 
+import android.graphics.Point;
+
 // this class represents a ping-pong ball
 class Ball
 {
+  // constants
+  final static int BALL_RADIUS = 10;  // радиус мяча
+  
   // fields
   private int x;
   private int y;
-  private int radius;
   private int color;
+  
+  // game variables
+  private int speedX;
+  private int speedY;
   
   // flags
   boolean isMovingLeft;
+  boolean isMovingUp;
   boolean isServed;
   
-  // constructor
-  Ball(int x, int y, int radius, int color)
+  // default constructor
+  Ball(int x, int y, int color)
   {
     this.x      = x;
     this.y      = y;
-    this.radius = radius;
     this.color  = color;
     
     isMovingLeft = false;
     isServed     = false;
+  }
+  
+  // alternative constructor
+  Ball(Point point, int color)
+  {
+    this(point.x, point.y, color);
   }
   
   // getter getX()
@@ -35,16 +49,22 @@ class Ball
   {
     return y;
   }
-  // getter getRadius()
-  int getRadius()
-  {
-    return radius;
-  }
   // getter getColor()
   int getColor()
   {
     return color;
   }
+  // getter getSpeedX()
+  int getSpeedX()
+  {
+    return speedX;
+  }
+  // getter getSpeedY()
+  int getSpeedY()
+  {
+    return speedY;
+  }
+  
   
   // setter setX()
   void setX(int x)
@@ -55,5 +75,33 @@ class Ball
   void setY(int y)
   {
     this.y = y;
+  }
+  // setter setSpeedX()
+  void setSpeedX(int speedX)
+  {
+    this.speedX = speedX;
+  }
+  // setter setSpeedY()
+  void setSpeedY(int speedY)
+  {
+    this.speedY = speedY;
+  }
+  
+  
+  // the ball bounces from vertical sides
+  void bounceFromVertical(boolean isMovingLeft)
+  {
+    if (isServed)
+    {
+      this.isMovingLeft = !isMovingLeft;
+    }
+  }
+  // the ball bounces from horizontal sides
+  void bounceFromHorizontal(boolean isMovingUp)
+  {
+    if (isServed)
+    {
+      this.isMovingUp = !isMovingUp;
+    }
   }
 }

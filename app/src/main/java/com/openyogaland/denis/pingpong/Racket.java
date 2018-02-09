@@ -1,29 +1,33 @@
 package com.openyogaland.denis.pingpong;
 
-import android.graphics.Rect;
+import android.graphics.Point;
 
 // This class represents a common ping-pong racket
 class Racket
 {
+  // constants
+  final static int RACKET_HEIGHT  = 20;
+  final static int RACKET_WIDTH   = 100;
+  final static int RACKET_PADDING = 30; // расстояние от рамки стола до ракетки
+  final static int RACKET_SPEED   = 15;
+  
   // fields
   private int x;
   private int y;
-  private int width;
-  private int height;
   private int color;
-  private Rect rect;
   
-  // constructor
-  Racket(int x, int y, int width, int height, int color)
+  // default constructor
+  Racket(int x, int y, int color)
   {
     this.x = x;
     this.y = y;
-    this.width  = width;
-    this.height = height;
     this.color  = color;
-    
-    rect = new Rect();
-    rect.set(x, y, x + width, y + height);
+  }
+  
+  // alternative constructor
+  Racket(Point point, int color)
+  {
+    this(point.x, point.y, color);
   }
   
   // setter setX()
@@ -47,53 +51,45 @@ class Racket
   {
     return y;
   }
-  // getter getWidth()
-  int getWidth()
-  {
-    return width;
-  }
-  // getter getHeight()
-  int getHeight()
-  {
-    return height;
-  }
   // getter getColor()
   int getColor()
   {
     return color;
   }
-  // getter getRect()
-  Rect getRect()
+  
+  // getters to draw a racket
+  int getLeft()
   {
-    rect.set(x, y, x + width, y + height);
-    return rect;
+    return x;
+  }
+  int getTop()
+  {
+    return y;
+  }
+  int getRight()
+  {
+    return x + RACKET_WIDTH;
+  }
+  int getBottom()
+  {
+    return y + RACKET_HEIGHT;
   }
   
-  // check if the ball is touching the X coordinate of the racket
+  // check if the ball is inside the X interval of the racket
   private boolean isTouchingX(Ball ball)
   {
-    // модуль разности между координатами X мяча и ракетки меньше или равен радиусу мяча
-    return Math.abs(ball.getX() - this.getX()) <= ball.getRadius();
+    return (ball.getX() + Ball.BALL_RADIUS >= this.getX()) &&
+           (ball.getX() - Ball.BALL_RADIUS <= this.getX() + RACKET_WIDTH);
   }
-  
-  // check if the ball is touching the Y coordinate of the racket
+  // check if the ball is inside the Y coordinate of the racket
   private boolean isTouchingY(Ball ball)
   {
-    // координата Y мяча + радиус мяча больше или равна minY ракетки
-    // координата Y мяча - радиус мяча меньше или равна maxY ракетки
-    return ball.getY() + ball.getRadius() >= this.getY()
-           && ball.getY() - ball.getRadius() <= this.getY() + this.getHeight();
+    return (ball.getY() + Ball.BALL_RADIUS >= this.getY()) &&
+           (ball.getY() - Ball.BALL_RADIUS <= this.getY() + RACKET_HEIGHT);
   }
-  
   // check if the ball is touching the racket
   boolean isTouching(Ball ball)
   {
     return isTouchingX(ball) && isTouchingY(ball);
-  }
-  
-  // check if the racket misses the ball
-  boolean isMissing(Ball ball)
-  {
-    return isTouchingX(ball) && !isTouchingY(ball);
   }
 }

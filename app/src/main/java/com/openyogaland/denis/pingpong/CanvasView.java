@@ -60,7 +60,7 @@ public class CanvasView extends View implements ICanvasView
     paint.setColor(color);
     canvas.drawRect(borderMargin, borderMargin, (screenWidth - borderMargin),
         (screenHeight - borderMargin), paint);
-    canvas.drawLine(screenWidth / 2, borderMargin, screenWidth / 2, (screenHeight - borderMargin),
+    canvas.drawLine(borderMargin, screenHeight / 2, screenWidth - borderMargin, screenHeight / 2,
         paint);
     redraw();
   }
@@ -71,7 +71,7 @@ public class CanvasView extends View implements ICanvasView
   {
     paint.setStyle(Style.FILL); // заполнение
     paint.setColor(racket.getColor());
-    canvas.drawRect(racket.getRect(), paint);
+    canvas.drawRect(racket.getLeft(), racket.getTop(), racket.getRight(), racket.getBottom(), paint);
     redraw();
   }
   
@@ -81,12 +81,13 @@ public class CanvasView extends View implements ICanvasView
   {
     paint.setStyle(Style.FILL); // заполнение
     paint.setColor(ball.getColor());
-    canvas.drawCircle(ball.getX(), ball.getY(), ball.getRadius(), paint);
+    canvas.drawCircle(ball.getX(), ball.getY(), Ball.BALL_RADIUS, paint);
     redraw();
   }
   
   // метод интерфейса ICanvasView
-  @Override public void showMessage(String text)
+  @Override
+  public void showMessage(String text)
   {
     if(toast != null) // если всплывающее сообщение на экране
     {
@@ -95,6 +96,7 @@ public class CanvasView extends View implements ICanvasView
     toast = Toast.makeText(getContext(), text, Toast.LENGTH_SHORT);
     toast.setGravity(Gravity.CENTER, 0, 0);
     toast.show();
+    redraw();
   }
   
   // Метод для обработки прикосновения к экрану
@@ -113,10 +115,12 @@ public class CanvasView extends View implements ICanvasView
     if(motionEvent.getAction() == MotionEvent.ACTION_DOWN)
     {
       performClick();
+      redraw();
     }
     if(motionEvent.getAction() == MotionEvent.ACTION_UP)
     {
       gameController.playerServe();
+      redraw();
     }
     return true;
   }
