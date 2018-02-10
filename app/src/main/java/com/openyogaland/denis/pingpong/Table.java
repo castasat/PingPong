@@ -61,13 +61,13 @@ class Table
   // get top border
   int getTopBorderY()
   {
-    topBorderY = BORDER_MARGIN + BORDER_WIDTH;
+    topBorderY = BORDER_MARGIN * 3 + BORDER_WIDTH;
     return topBorderY;
   }
   // get bottom border
   int getBottomBorderY()
   {
-    bottomBorderY = screenHeight - BORDER_MARGIN - BORDER_WIDTH;
+    bottomBorderY = screenHeight - BORDER_MARGIN * 3 - BORDER_WIDTH;
     return bottomBorderY;
   }
  
@@ -112,11 +112,6 @@ class Table
   {
     return (x >= getRightBorderX()) && (y <= screenHeight/2);
   }
-  // is on opponent border
-  boolean isOnOpponentBorder(int x, int y)
-  {
-    return isOnTopBorder(x, y) || isOnOpponentLeftBorder(x, y) || isOnOpponentRightBorder(x, y);
-  }
   
   // is on bottom border
   boolean isOnBottomBorder(int x, int y)
@@ -132,10 +127,5 @@ class Table
   boolean isOnOPlayerRightBorder(int x, int y)
   {
     return (x >= getRightBorderX()) && (y > screenHeight / 2);
-  }
-  // is on player border
-  boolean isOnPlayerBorder(int x, int y)
-  {
-    return isOnBottomBorder(x, y) || isOnPlayerLeftBorder(x, y) || isOnOPlayerRightBorder(x, y);
   }
 } 

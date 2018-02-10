@@ -68,6 +68,26 @@ class Ball
     return speedY;
   }
   
+  // getter getLeft()
+  int getLeft()
+  {
+    return x - RADIUS;
+  }
+  // getter getRight()
+  int getRight()
+  {
+    return x + RADIUS;
+  }
+  // getter getTop()
+  int getTop()
+  {
+    return y - RADIUS;
+  }
+  // getter getBottom()
+  int getBottom()
+  {
+    return y + RADIUS;
+  }
   
   // setter setX()
   void setX(int x)
@@ -92,7 +112,7 @@ class Ball
   
   
   // the ball bounces from vertical sides
-  void bounceFromVertical(boolean isMovingLeft)
+  void bounceFromVertical()
   {
     if (isServed)
     {
@@ -100,7 +120,7 @@ class Ball
     }
   }
   // the ball bounces from horizontal sides
-  void bounceFromHorizontal(boolean isMovingUp)
+  void bounceFromHorizontal()
   {
     if (isServed)
     {

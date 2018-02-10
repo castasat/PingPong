@@ -87,14 +87,12 @@ class Racket
   // check if the ball is inside the X interval of the racket
   private boolean isTouchingX(Ball ball)
   {
-    return (ball.getX() + Ball.RADIUS >= this.getX()) &&
-           (ball.getX() - Ball.RADIUS <= this.getX() + RACKET_WIDTH);
+    return (ball.getRight() >= this.getLeft()) && (ball.getLeft() <= this.getRight());
   }
   // check if the ball is inside the Y coordinate of the racket
   private boolean isTouchingY(Ball ball)
   {
-    return (ball.getY() + Ball.RADIUS >= this.getY()) &&
-           (ball.getY() - Ball.RADIUS <= this.getY() + RACKET_HEIGHT);
+    return (ball.getBottom() >= this.getTop()) && (ball.getTop() <= this.getBottom());
   }
   // check if the ball is touching the racket
   boolean isTouching(Ball ball)

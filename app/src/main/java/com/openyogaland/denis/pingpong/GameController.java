@@ -1,5 +1,6 @@
 package com.openyogaland.denis.pingpong;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -71,7 +72,7 @@ class GameController implements Runnable
       
       // задаём случайную скорость мяча по координатам X и Y из интервала
       ball.setSpeedY(getRandomInt(Ball.MIN_SPEED, Ball.MAX_SPEED));
-      ball.setSpeedX(getRandomInt(Ball.MIN_SPEED, Ball.MAX_SPEED));
+      ball.setSpeedX(getRandomInt(Ball.MIN_SPEED / 2, Ball.MAX_SPEED / 2));
     }
   }
   
@@ -180,45 +181,83 @@ class GameController implements Runnable
         // Если мяч подан
         if(ball.isServed)
         {
-          // устанавливаем смещение мяча по оси Y в пределах стола
-          if (ball.getY() - Ball.RADIUS > Table.BORDER_MARGIN + Table.BORDER_WIDTH && ball.getY() +
-              Ball.RADIUS < table.getScreenHeight() - Table.BORDER_MARGIN - Table.BORDER_WIDTH)
+          // Задаём мячу смещение по оси X
+          if(ball.isMovingLeft)
           {
-            ball.setY(ball.getY() + ball.getSpeedY());
+            // если мяч движется влево
+            ball.setX(ball.getX() - ball.getSpeedX());
+            // и достиг левого края стола
+            if (ball.getLeft() <= table.getLeftBorderX())
+            {
+              ball.bounceFromVertical(); // мяч отскакивает от края стола
+            }
+          }
+          else
+          {
+            // если мяч движется право
+            ball.setX(ball.getX() + ball.getSpeedX());
+            // и достиг правого края стола
+            if (ball.getRight() >= table.getRightBorderX())
+            {
+              ball.bounceFromVertical(); // мяч отскакивает от края стола
+            }
           }
           
-          // устанавливаем смещение мяча по оси X
-          // если мяч движется вправо и не пересек правую границу стола
-          if (!ball.isMovingLeft && ball.getX() + Ball.RADIUS < table.getScreenWidth() -
-              Table.BORDER_MARGIN - Table.BORDER_WIDTH)
+          // Задаём мячу смещение по оси Y
+          if(ball.isMovingUp)
           {
-            ball.setX(ball.getX() + ball.getSpeedX());
-            
-            // если мяч отбит оппонентом
+            // если мяч движется вверх
+            ball.setY(ball.getY() - ball.getSpeedY());
+            // и сталкивается с ракеткой оппонента
             if (opponentRacket.isTouching(ball))
             {
-              ball.isMovingLeft = true;
-              // устанавливаем новую скорость мяча по осям X и Y
-              ball.setSpeedX(getRandomInt(Ball.MIN_SPEED, Ball.MAX_SPEED));
-              ball.setSpeedY(getRandomInt(Ball.MIN_SPEED, Ball.MAX_SPEED));
+              ball.bounceFromHorizontal(); // мяч отскакивает от ракетки оппонента
             }
-            // TODO если мяч пропущен оппонентом
+            // если не отбит ракеткой оппонента
+            else if (ball.getTop() <= 0)
+            {
+              // оппонент проигрывает раунд
+              playerScore++;
+              // проверяем условие победы игрока
+              if (playerScore >= winningScore)
+              {
+                // завершение игры
+                // TODO canvasView.showMessage("Congratulations! You win the game!");
+                // TODO gameOver();
+              }
+              else
+              {
+                // если игра не окончена, стартуем следующий раунд
+                newRound();
+              }
+            }
           }
-          // если мяч движется влево и не пересёк левую границу стола
-          else if (ball.isMovingLeft && ball.getX() - Ball.RADIUS > Table.BORDER_MARGIN +
-                   Table.BORDER_WIDTH)
+          else
           {
-            ball.setX(ball.getX() - ball.getSpeedX());
-            
-            // если мяч отбит игроком
+            // если мяч движется вниз
+            ball.setY(ball.getY() + ball.getSpeedY());
+            // и сталкивается с ракеткой игрока
             if (playerRacket.isTouching(ball))
             {
-              ball.isMovingLeft = false;
-              // устанавливаем новую скорость мяча по осям X и Y
-              ball.setSpeedX(getRandomInt(Ball.MIN_SPEED, Ball.MAX_SPEED));
-              ball.setSpeedY(getRandomInt(Ball.MIN_SPEED, Ball.MAX_SPEED));
+              ball.bounceFromHorizontal(); // мяч отскакивает от ракетки игрока
             }
-            // TODO если мяч пропущен игроком
+            else if (ball.getBottom() >= table.getScreenHeight())
+            {
+              // игрок проигрывает раунд
+              opponentScore++;
+              // проверяем условие победы оппонента
+              if(opponentScore >= winningScore)
+              {
+                // завершение игры
+                // TODO canvasView.showMessage("Sorry, but you lose the game!");
+                // TODO gameOver();
+              }
+              else
+              {
+                // если игра не окончена, стартуем следующий раунд
+                newRound();
+              }
+            }
           }
         }
       }
@@ -231,5 +270,14 @@ class GameController implements Runnable
         worker = null;
       }
     }
+  }
+  
+  // начинаем новый раунд игры, для чего
+  private void newRound()
+  {
+    // реинициализируем мяч
+    ball.isServed = false;
+    ball.setX(playerRacket.getCenterX());
+    ball.setY(table.getInitBallPosition().y);
   }
 }

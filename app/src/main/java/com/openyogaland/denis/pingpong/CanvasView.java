@@ -15,7 +15,7 @@ public class CanvasView extends View implements ICanvasView
 {
   // поля
   private Paint  paint;  // "кисточка" для рисования
-  Canvas canvas; // "холст" для рисования
+          Canvas canvas; // "холст" для рисования
   
   private GameController gameController; // "логика" игры
   private Toast          toast;          // всплывающее сообщение
