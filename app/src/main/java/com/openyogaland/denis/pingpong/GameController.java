@@ -10,10 +10,6 @@ import android.view.WindowManager;
 class GameController implements Runnable
 {
   // parameters
-  private int minBallSpeed  = 10;  // минимальная скорость мяча
-  private int maxBallSpeed  = 60;  // максимальная скорость мяча
-  private int minBallSlideY = -20; // минимальное отклонение мяча по оси Y
-  private int maxBallSlideY = 20;  // максимальное отклонение мяча по оси Y
   private int sleepTime     = 30;  // время приостановки потока в мсек
   private int winningScore  = 21;  // выигрышный счёт
   
@@ -37,7 +33,6 @@ class GameController implements Runnable
   {
     WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
     if(windowManager != null)
-    
     {
       this.canvasView = canvasView;
       Display display = windowManager.getDefaultDisplay();
@@ -67,10 +62,16 @@ class GameController implements Runnable
   {
     if (!ball.isServed)
     {
+      // задаём направление смещения мяча по оси X установкой флага
+      ball.isMovingLeft = getRandomInt(0, 1) != 0;
+      // устанавливаем флаг, что мяч движется вверх
+      ball.isMovingUp = true;
+      // устанавливаем флаг, что мяч подан
       ball.isServed = true;
-      // задаём произвольную скорость мяча и произвольное смещение мяча по оси Y
-      ball.setSpeedX(getRandomInt(minBallSpeed, maxBallSpeed));
-      ball.setSpeedY(getRandomInt(minBallSlideY, maxBallSlideY));
+      
+      // задаём случайную скорость мяча по координатам X и Y из интервала
+      ball.setSpeedY(getRandomInt(Ball.MIN_SPEED, Ball.MAX_SPEED));
+      ball.setSpeedX(getRandomInt(Ball.MIN_SPEED, Ball.MAX_SPEED));
     }
   }
   
@@ -84,6 +85,9 @@ class GameController implements Runnable
   private void initOpponentRacket()
   {
     opponentRacket = new Racket(table.getInitOpponentRacketPosition(), opponentColor);
+
+    // устанавливаем случайно флаг направления начального движения ракетки оппонента
+    opponentRacket.isMovingLeft = getRandomInt(0, 1) == 0;
   }
   
   // player racket initialization
@@ -108,34 +112,34 @@ class GameController implements Runnable
     canvasView.drawRacket(opponentRacket);
   }
   
-  // this method moves player racket according to screen touch event Y coordinate
+  // this method moves player racket according to screen touch event X coordinate
   // and moves ball with the player racket if it has not been served yet
   void onTouchEvent(int x, int y)
   {
-    // если касание выше (координата Y меньше) верхнего края ракетки
-    // и верхний край ракетки ниже (координата Y больше) верхнего края поля
-    if(y < playerRacket.getY() && playerRacket.getY() > Table.BORDER_MARGIN + Table.BORDER_WIDTH)
+    // если касание левее (координата X меньше) середины ракетки
+    // и левый край ракетки правее (координата X больше) левого края стола
+    if(x < playerRacket.getCenterX() && playerRacket.getLeft() >= table.getLeftBorderX())
     {
-      // передвигаем ракетку игрока вверх
-      playerRacket.setY(playerRacket.getY() - Racket.RACKET_SPEED);
+      // передвигаем ракетку игрока влево
+      playerRacket.setX(playerRacket.getX() - Racket.RACKET_SPEED);
       
-      // передвигаем мяч вверх вместе с ракеткой, если он ещё не был подан
+      // передвигаем мяч влево вместе с ракеткой, если он ещё не был подан
       if (!ball.isServed)
       {
-        ball.setY(ball.getY() - Racket.RACKET_SPEED);
+        ball.setX(ball.getX() - Racket.RACKET_SPEED);
       }
     }
-    // иначе если нижний край ракетки игрока выше (координата Y меньше) нижнего края поля
-    else if(playerRacket.getY() + Racket.RACKET_HEIGHT < table.getScreenHeight() - Table
-        .BORDER_MARGIN - Table.BORDER_WIDTH)
+    // иначе если касание правее (координата X больше) середины ракетки
+    // и правый край ракетки левее (координата X меньше) правого края стола
+    else if(x >= playerRacket.getCenterX() && playerRacket.getRight() <= table.getRightBorderX())
     {
-      // передвигаем ракетку игрока вниз
-      playerRacket.setY(playerRacket.getY() + Racket.RACKET_SPEED);
+      // передвигаем ракетку игрока вправо
+      playerRacket.setX(playerRacket.getX() + Racket.RACKET_SPEED);
       
-      // передвигаем мяч вниз вместе с ракеткой, если он ещё не был подан
+      // передвигаем мяч вправо вместе с ракеткой, если он ещё не был подан
       if(!ball.isServed)
       {
-        ball.setY(ball.getY() + Racket.RACKET_SPEED);
+        ball.setX(ball.getX() + Racket.RACKET_SPEED);
       }
     }
   }
@@ -149,37 +153,43 @@ class GameController implements Runnable
       try
       {
         Thread.sleep(sleepTime); // задержка
-    
-        // Ракетку оппонента стараемся переместить напротив мяча
-        // если мяч выше середины ракетки оппонента
-        if(ball.getY() < opponentRacket.getY() + (Racket.RACKET_HEIGHT / 2) &&
-            opponentRacket.getY() > Table.BORDER_MARGIN + Table.BORDER_WIDTH)
+
+        // Передвигаем ракетку вправо или влево в зависимости от значения флага
+        if (opponentRacket.isMovingLeft)
         {
-          // передвигаем ракетку оппонента вверх
-          opponentRacket.setY(opponentRacket.getY() - Racket.RACKET_SPEED);
+          // перемещаем ракетку оппонента влево
+          opponentRacket.setX(opponentRacket.getX() - Racket.RACKET_SPEED);
         }
-        // если мяч ниже середины ракетки оппонента
-        if(ball.getY() > opponentRacket.getY() + (Racket.RACKET_HEIGHT / 2) &&
-           opponentRacket.getY() + Racket.RACKET_HEIGHT < table.getScreenHeight() -
-           Table.BORDER_MARGIN - Table.BORDER_WIDTH)
+        else
         {
-          // передвигаем ракетку опонента вниз
-          opponentRacket.setY(opponentRacket.getY() + Racket.RACKET_SPEED);
+          // перемещаем ракетку оппонента вправо
+          opponentRacket.setX(opponentRacket.getX() + Racket.RACKET_SPEED);
+        }
+        
+        // Если ракетка оппонента достигла левой границы стола
+        if(opponentRacket.getLeft() <= table.getLeftBorderX())
+        {
+          opponentRacket.isMovingLeft = false;
+        }
+        // если ракетка достигла правой границы стола
+        else if(opponentRacket.getRight() >= table.getRightBorderX())
+        {
+          opponentRacket.isMovingLeft = true;
         }
         
         // Если мяч подан
         if(ball.isServed)
         {
           // устанавливаем смещение мяча по оси Y в пределах стола
-          if (ball.getY() - Ball.BALL_RADIUS > Table.BORDER_MARGIN + Table.BORDER_WIDTH && ball.getY() +
-              Ball.BALL_RADIUS < table.getScreenHeight() - Table.BORDER_MARGIN - Table.BORDER_WIDTH)
+          if (ball.getY() - Ball.RADIUS > Table.BORDER_MARGIN + Table.BORDER_WIDTH && ball.getY() +
+              Ball.RADIUS < table.getScreenHeight() - Table.BORDER_MARGIN - Table.BORDER_WIDTH)
           {
             ball.setY(ball.getY() + ball.getSpeedY());
           }
           
           // устанавливаем смещение мяча по оси X
           // если мяч движется вправо и не пересек правую границу стола
-          if (!ball.isMovingLeft && ball.getX() + Ball.BALL_RADIUS < table.getScreenWidth() -
+          if (!ball.isMovingLeft && ball.getX() + Ball.RADIUS < table.getScreenWidth() -
               Table.BORDER_MARGIN - Table.BORDER_WIDTH)
           {
             ball.setX(ball.getX() + ball.getSpeedX());
@@ -188,15 +198,14 @@ class GameController implements Runnable
             if (opponentRacket.isTouching(ball))
             {
               ball.isMovingLeft = true;
-              // устанавливаем новую скорость мяча
-              ball.setSpeedX(getRandomInt(minBallSpeed, maxBallSpeed));
-              // устанавливаем новое смещение мяча
-              ball.setSpeedY(getRandomInt(minBallSlideY, maxBallSlideY));
+              // устанавливаем новую скорость мяча по осям X и Y
+              ball.setSpeedX(getRandomInt(Ball.MIN_SPEED, Ball.MAX_SPEED));
+              ball.setSpeedY(getRandomInt(Ball.MIN_SPEED, Ball.MAX_SPEED));
             }
             // TODO если мяч пропущен оппонентом
           }
           // если мяч движется влево и не пересёк левую границу стола
-          else if (ball.isMovingLeft && ball.getX() - Ball.BALL_RADIUS > Table.BORDER_MARGIN +
+          else if (ball.isMovingLeft && ball.getX() - Ball.RADIUS > Table.BORDER_MARGIN +
                    Table.BORDER_WIDTH)
           {
             ball.setX(ball.getX() - ball.getSpeedX());
@@ -205,10 +214,9 @@ class GameController implements Runnable
             if (playerRacket.isTouching(ball))
             {
               ball.isMovingLeft = false;
-              // устанавливаем новую скорость мяча
-              ball.setSpeedX(getRandomInt(minBallSpeed, maxBallSpeed));
-              // устанавливаем новое смещение мяча
-              ball.setSpeedY(getRandomInt(minBallSlideY, maxBallSlideY));
+              // устанавливаем новую скорость мяча по осям X и Y
+              ball.setSpeedX(getRandomInt(Ball.MIN_SPEED, Ball.MAX_SPEED));
+              ball.setSpeedY(getRandomInt(Ball.MIN_SPEED, Ball.MAX_SPEED));
             }
             // TODO если мяч пропущен игроком
           }

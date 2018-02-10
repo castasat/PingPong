@@ -6,7 +6,9 @@ import android.graphics.Point;
 class Ball
 {
   // constants
-  final static int BALL_RADIUS = 10;  // радиус мяча
+  final static int RADIUS      = 10;  // радиус мяча
+  final static int MIN_SPEED   = 10;  // минимальная скорость мяча
+  final static int MAX_SPEED   = 30;  // максимальная скорость мяча
   
   // fields
   private int x;
@@ -29,6 +31,7 @@ class Ball
     this.y      = y;
     this.color  = color;
     
+    isMovingUp   = false;
     isMovingLeft = false;
     isServed     = false;
   }

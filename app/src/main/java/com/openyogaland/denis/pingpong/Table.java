@@ -93,7 +93,7 @@ class Table
   {
     Point point = new Point();
     point.x = screenWidth / 2;
-    point.y = getInitPlayerRacketPosition().y - Ball.BALL_RADIUS;
+    point.y = getInitPlayerRacketPosition().y - Ball.RADIUS;
     return point;
   }
   

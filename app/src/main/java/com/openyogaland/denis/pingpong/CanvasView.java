@@ -81,7 +81,7 @@ public class CanvasView extends View implements ICanvasView
   {
     paint.setStyle(Style.FILL); // заполнение
     paint.setColor(ball.getColor());
-    canvas.drawCircle(ball.getX(), ball.getY(), Ball.BALL_RADIUS, paint);
+    canvas.drawCircle(ball.getX(), ball.getY(), Ball.RADIUS, paint);
     redraw();
   }
   

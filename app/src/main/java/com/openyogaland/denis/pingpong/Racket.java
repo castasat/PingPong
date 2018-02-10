@@ -16,6 +16,9 @@ class Racket
   private int y;
   private int color;
   
+  // flags
+  boolean isMovingLeft = false;
+  
   // default constructor
   Racket(int x, int y, int color)
   {
@@ -75,17 +78,23 @@ class Racket
     return y + RACKET_HEIGHT;
   }
   
+  // getter returning the X coordinate of Racket center
+  int getCenterX()
+  {
+    return x + RACKET_WIDTH / 2;
+  }
+  
   // check if the ball is inside the X interval of the racket
   private boolean isTouchingX(Ball ball)
   {
-    return (ball.getX() + Ball.BALL_RADIUS >= this.getX()) &&
-           (ball.getX() - Ball.BALL_RADIUS <= this.getX() + RACKET_WIDTH);
+    return (ball.getX() + Ball.RADIUS >= this.getX()) &&
+           (ball.getX() - Ball.RADIUS <= this.getX() + RACKET_WIDTH);
   }
   // check if the ball is inside the Y coordinate of the racket
   private boolean isTouchingY(Ball ball)
   {
-    return (ball.getY() + Ball.BALL_RADIUS >= this.getY()) &&
-           (ball.getY() - Ball.BALL_RADIUS <= this.getY() + RACKET_HEIGHT);
+    return (ball.getY() + Ball.RADIUS >= this.getY()) &&
+           (ball.getY() - Ball.RADIUS <= this.getY() + RACKET_HEIGHT);
   }
   // check if the ball is touching the racket
   boolean isTouching(Ball ball)
