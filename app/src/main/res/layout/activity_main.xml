@@ -9,6 +9,7 @@
     tools:context="com.openyogaland.denis.pingpong.MainActivity">
 
     <com.openyogaland.denis.pingpong.CanvasView
+        android:id="@+id/canvas_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
     

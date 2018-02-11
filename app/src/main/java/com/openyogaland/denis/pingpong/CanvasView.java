@@ -4,6 +4,9 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
+import android.os.Handler;
+import android.os.Handler.Callback;
+import android.os.Message;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -11,11 +14,12 @@ import android.view.View;
 import android.widget.Toast;
 
 // this class is a View, on which we can draw something
-public class CanvasView extends View implements ICanvasView
+public class CanvasView extends View implements ICanvasView, Callback
 {
   // поля
-  private Paint  paint;  // "кисточка" для рисования
-          Canvas canvas; // "холст" для рисования
+  private Paint   paint;   // "кисточка" для рисования
+          Canvas  canvas;  // "холст" для рисования
+          Handler handler; // хэндлер для отправки сообщений между потоками
   
   private GameController gameController; // "логика" игры
   private Toast          toast;          // всплывающее сообщение
@@ -26,6 +30,17 @@ public class CanvasView extends View implements ICanvasView
     super(context, attrs);
     initPaint(); // инициализируем "кисточку"
     gameController = new GameController(this, context);
+    
+    // передаём хэндлеру ссылку на класс, реализующий интерфейс Callback для обработки сообщения
+    handler = new Handler(this);
+  }
+  
+  // метод из класса Callback для обработки сообщений
+  @Override
+  public boolean handleMessage(Message message)
+  {
+    showMessage(message.getData().getString("message"));
+    return true;
   }
   
   // инициализируем "кисточку"

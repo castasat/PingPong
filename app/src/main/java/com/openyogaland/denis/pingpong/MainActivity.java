@@ -8,6 +8,10 @@ import android.view.WindowManager.LayoutParams;
 
 public class MainActivity extends AppCompatActivity
 {
+  // fields
+  CanvasView canvasView;
+  
+  // вызывается при создании главной активости
   @Override
   protected void onCreate(Bundle savedInstanceState)
   {
@@ -24,7 +28,19 @@ public class MainActivity extends AppCompatActivity
       actionBar.hide();
     }
     
+    // находим canvasView по id
+    canvasView = findViewById(R.id.canvas_view);
+    
     // применяем XML layout-файл
     setContentView(R.layout.activity_main);
+  }
+  
+  // очищаем память от всех обработчиков сообщений и сообщений, чтобы не держали ссылок
+  @Override
+  protected void onDestroy()
+  {
+    if(canvasView.handler != null)
+      canvasView.handler.removeCallbacksAndMessages(null);
+    super.onDestroy();
   }
 }

@@ -1,9 +1,10 @@
 package com.openyogaland.denis.pingpong;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.os.Bundle;
+import android.os.Message;
 import android.view.Display;
 import android.view.WindowManager;
 
@@ -222,8 +223,13 @@ class GameController implements Runnable
               if (playerScore >= winningScore)
               {
                 // завершение игры
-                // TODO canvasView.showMessage("Congratulations! You win the game!");
-                // TODO gameOver();
+                Message message = canvasView.handler.obtainMessage();
+                Bundle  bundle  = new Bundle();
+                bundle.putString("message", "Congratulations! You win the game!");
+                message.setData(bundle);
+                canvasView.handler.sendMessage(message);
+                
+                gameOver();
               }
               else
               {
@@ -249,8 +255,13 @@ class GameController implements Runnable
               if(opponentScore >= winningScore)
               {
                 // завершение игры
-                // TODO canvasView.showMessage("Sorry, but you lose the game!");
-                // TODO gameOver();
+                Message message = canvasView.handler.obtainMessage();
+                Bundle bundle = new Bundle();
+                bundle.putString("message", "Sorry, but you lose the game!");
+                message.setData(bundle);
+                canvasView.handler.sendMessage(message);
+                
+                gameOver();
               }
               else
               {
@@ -270,6 +281,14 @@ class GameController implements Runnable
         worker = null;
       }
     }
+  }
+  
+  // reinitialize ball and scores at the end of the game
+  private void gameOver()
+  {
+    playerScore   = 0;
+    opponentScore = 0;
+    newRound();
   }
   
   // начинаем новый раунд игры, для чего
