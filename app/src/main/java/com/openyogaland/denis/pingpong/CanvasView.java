@@ -120,11 +120,10 @@ public class CanvasView extends View implements ICanvasView, Callback
   {
     // получаем координаты касания
     int x = (int) motionEvent.getX();
-    int y = (int) motionEvent.getY();
     
     if(motionEvent.getAction() == MotionEvent.ACTION_MOVE)
     {
-      gameController.onTouchEvent(x, y);
+      gameController.onTouchEvent(x);
       redraw(); // нужно, чтобы у объекта View обновилось положение
     }
     if(motionEvent.getAction() == MotionEvent.ACTION_DOWN)

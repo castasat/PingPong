@@ -25,7 +25,7 @@ class Ball
   boolean isServed;
   
   // default constructor
-  Ball(int x, int y, int color)
+  private Ball(int x, int y, int color)
   {
     this.x      = x;
     this.y      = y;

@@ -20,7 +20,7 @@ class Racket
   boolean isMovingLeft = false;
   
   // default constructor
-  Racket(int x, int y, int color)
+  private Racket(int x, int y, int color)
   {
     this.x = x;
     this.y = y;
@@ -38,22 +38,13 @@ class Racket
   {
     this.x = x;
   }
-  // setter setY()
-  void setY(int y)
-  {
-    this.y = y;
-  }
   
   // getter getX()
   int getX()
   {
     return x;
   }
-  // getter getY()
-  int getY()
-  {
-    return y;
-  }
+
   // getter getColor()
   int getColor()
   {

@@ -11,14 +11,6 @@ import android.view.WindowManager;
 // represents Controller of the game and it's logic
 class GameController implements Runnable
 {
-  // parameters
-  private int sleepTime     = 30;  // время приостановки потока в мсек
-  private int winningScore  = 21;  // выигрышный счёт
-  
-  // цвета мяча, игрока и оппонента
-  private int ballColor     = Color.WHITE;
-  private int playerColor   = Color.BLUE;
-  private int opponentColor = Color.RED;
   
   // fields
   private CanvasView canvasView;        // View, on which we can draw something
@@ -86,6 +78,7 @@ class GameController implements Runnable
   // opponent racket initialization
   private void initOpponentRacket()
   {
+    int opponentColor = Color.RED;
     opponentRacket = new Racket(table.getInitOpponentRacketPosition(), opponentColor);
 
     // устанавливаем случайно флаг направления начального движения ракетки оппонента
@@ -95,12 +88,14 @@ class GameController implements Runnable
   // player racket initialization
   private void initPlayerRacket()
   {
+    int playerColor = Color.BLUE;
     playerRacket = new Racket(table.getInitPlayerRacketPosition(), playerColor);
   }
   
   // ping-pong ball initialization
   private void initBall()
   {
+    int ballColor = Color.WHITE;
     ball = new Ball(table.getInitBallPosition(), ballColor);
   }
   
@@ -116,11 +111,11 @@ class GameController implements Runnable
   
   // this method moves player racket according to screen touch event X coordinate
   // and moves ball with the player racket if it has not been served yet
-  void onTouchEvent(int x, int y)
+  void onTouchEvent(int x)
   {
-    // если касание левее (координата X меньше) середины ракетки
+    // если касание левее левого края ракетки игрока
     // и левый край ракетки правее (координата X больше) левого края стола
-    if(x < playerRacket.getCenterX() && playerRacket.getLeft() >= table.getLeftBorderX())
+    if(x < playerRacket.getLeft() && playerRacket.getLeft() >= table.getLeftBorderX())
     {
       // передвигаем ракетку игрока влево
       playerRacket.setX(playerRacket.getX() - Racket.RACKET_SPEED);
@@ -131,9 +126,9 @@ class GameController implements Runnable
         ball.setX(ball.getX() - Racket.RACKET_SPEED);
       }
     }
-    // иначе если касание правее (координата X больше) середины ракетки
+    // иначе если касание правее правого края ракетки игрока
     // и правый край ракетки левее (координата X меньше) правого края стола
-    else if(x >= playerRacket.getCenterX() && playerRacket.getRight() <= table.getRightBorderX())
+    else if(x >= playerRacket.getRight() && playerRacket.getRight() <= table.getRightBorderX())
     {
       // передвигаем ракетку игрока вправо
       playerRacket.setX(playerRacket.getX() + Racket.RACKET_SPEED);
@@ -154,10 +149,11 @@ class GameController implements Runnable
     {
       try
       {
+        int sleepTime = 30;
         Thread.sleep(sleepTime); // задержка
-
-        // Передвигаем ракетку вправо или влево в зависимости от значения флага
-        if (opponentRacket.isMovingLeft)
+  
+        // Передвигаем ракетку оппонента вправо или влево в зависимости от значения флага
+        if(opponentRacket.isMovingLeft)
         {
           // перемещаем ракетку оппонента влево
           opponentRacket.setX(opponentRacket.getX() - Racket.RACKET_SPEED);
@@ -167,21 +163,37 @@ class GameController implements Runnable
           // перемещаем ракетку оппонента вправо
           opponentRacket.setX(opponentRacket.getX() + Racket.RACKET_SPEED);
         }
-        
+  
         // Если ракетка оппонента достигла левой границы стола
         if(opponentRacket.getLeft() <= table.getLeftBorderX())
         {
+          // она начинает двигаться вправо
           opponentRacket.isMovingLeft = false;
         }
         // если ракетка достигла правой границы стола
         else if(opponentRacket.getRight() >= table.getRightBorderX())
         {
+          // она начинает двигаться влево
           opponentRacket.isMovingLeft = true;
         }
-        
+  
         // Если мяч подан
-        if(ball.isServed)
+        else if(ball.isServed)
         {
+          // Передвигаем ракетку оппонента вслед за мячом, чтобы отбить его
+          // если левая граница ракетки оппонента правее мяча
+          if(ball.getRight() < opponentRacket.getLeft())
+          {
+            // она начинает двигаться влево
+            opponentRacket.isMovingLeft = true;
+          }
+          // если правая граница ракетки оппонента левее мяча
+          else if(ball.getLeft() > opponentRacket.getRight())
+          {
+            // она начинает двигаться вправо
+            opponentRacket.isMovingLeft = false;
+          }
+          
           // Задаём мячу смещение по оси X
           if(ball.isMovingLeft)
           {
@@ -205,6 +217,7 @@ class GameController implements Runnable
           }
           
           // Задаём мячу смещение по оси Y
+          int winningScore = 21;
           if(ball.isMovingUp)
           {
             // если мяч движется вверх
@@ -213,6 +226,9 @@ class GameController implements Runnable
             if (opponentRacket.isTouching(ball))
             {
               ball.bounceFromHorizontal(); // мяч отскакивает от ракетки оппонента
+              // задаём случайную скорость мяча по координатам X и Y из интервала
+              ball.setSpeedY(getRandomInt(Ball.MIN_SPEED, Ball.MAX_SPEED));
+              ball.setSpeedX(getRandomInt(Ball.MIN_SPEED / 2, Ball.MAX_SPEED / 2));
             }
             // если не отбит ракеткой оппонента
             else if (ball.getTop() <= 0)
@@ -246,6 +262,9 @@ class GameController implements Runnable
             if (playerRacket.isTouching(ball))
             {
               ball.bounceFromHorizontal(); // мяч отскакивает от ракетки игрока
+              // задаём случайную скорость мяча по координатам X и Y из интервала
+              ball.setSpeedY(getRandomInt(Ball.MIN_SPEED, Ball.MAX_SPEED));
+              ball.setSpeedX(getRandomInt(Ball.MIN_SPEED / 2, Ball.MAX_SPEED / 2));
             }
             else if (ball.getBottom() >= table.getScreenHeight())
             {
