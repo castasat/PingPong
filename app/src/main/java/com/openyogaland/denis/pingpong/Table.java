@@ -71,12 +71,28 @@ class Table
     point.y = getTopBorderY() + Racket.RACKET_PADDING;
     return point;
   }
+  // get opponentScore text position
+  Point getOpponentScoreTextPosition()
+  {
+    Point point = new Point();
+    point.x = screenWidth / 2;
+    point.y = screenHeight / 2 - BORDER_MARGIN * 2;
+    return point;
+  }
   // get initial playerRacket position
   Point getInitPlayerRacketPosition()
   {
     Point point = new Point();
     point.x = (screenWidth - Racket.RACKET_WIDTH) / 2;
     point.y = getBottomBorderY() - Racket.RACKET_PADDING - Racket.RACKET_HEIGHT;
+    return point;
+  }
+  // get playerScore text position
+  Point getPlayerScoreTextPosition()
+  {
+    Point point = new Point();
+    point.x = screenWidth / 2;
+    point.y = screenHeight / 2 + BORDER_MARGIN * 4;
     return point;
   }
   // get initial ball position

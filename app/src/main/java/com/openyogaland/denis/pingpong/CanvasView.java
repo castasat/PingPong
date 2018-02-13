@@ -3,7 +3,9 @@ package com.openyogaland.denis.pingpong;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Paint.Align;
 import android.graphics.Paint.Style;
+import android.graphics.Point;
 import android.os.Handler;
 import android.os.Handler.Callback;
 import android.os.Message;
@@ -16,12 +18,15 @@ import android.widget.Toast;
 // this class is a View, on which we can draw something
 public class CanvasView extends View implements ICanvasView, Callback
 {
-  // поля
-  private Paint   paint;   // "кисточка" для рисования
-          Canvas  canvas;  // "холст" для рисования
-          Handler handler; // хэндлер для отправки сообщений между потоками
+  // константы
+  final static int SCORE_TEXT_SIZE = 100;
+  final static int STROKE_WIDTH    = 6;
   
-  private GameController gameController; // "логика" игры
+  // поля
+  private Paint          paint;          // "кисточка" для рисования
+          Canvas         canvas;         // "холст" для рисования
+          Handler        handler;        // хэндлер для отправки сообщений между потоками
+          GameController gameController; // "логика" игры
   private Toast          toast;          // всплывающее сообщение
   
   // constructor
@@ -39,7 +44,15 @@ public class CanvasView extends View implements ICanvasView, Callback
   @Override
   public boolean handleMessage(Message message)
   {
-    showMessage(message.getData().getString("message"));
+    switch (message.what)
+    {
+      case GameController.PLAYER_WINS:
+        showMessage(getContext().getString(R.string.player_wins));
+        break;
+      case GameController.OPPONENT_WINS:
+        showMessage(getContext().getString(R.string.opponent_wins));
+        break;
+    }
     return true;
   }
   
@@ -71,7 +84,7 @@ public class CanvasView extends View implements ICanvasView, Callback
   public void drawTable(int screenWidth, int screenHeight, int borderMargin, int borderWidth, int color)
   {
     paint.setStyle(Style.STROKE); // обводка
-    paint.setStrokeWidth(borderWidth);
+    paint.setStrokeWidth(STROKE_WIDTH);
     paint.setColor(color);
     canvas.drawRect(borderMargin, borderMargin, (screenWidth - borderMargin),
         (screenHeight - borderMargin), paint);
@@ -84,7 +97,12 @@ public class CanvasView extends View implements ICanvasView, Callback
   @Override
   public void drawRacket(Racket racket)
   {
-    paint.setStyle(Style.FILL); // заполнение
+    paint.setColor(GameController.WHITE_COLOR);
+    paint.setStyle(Style.STROKE); // обводка
+    paint.setStrokeWidth(STROKE_WIDTH);
+    canvas.drawRect(racket.getLeft(), racket.getTop(), racket.getRight(), racket.getBottom(), paint);
+    
+    paint.setStyle(Style.FILL);   // заполнение
     paint.setColor(racket.getColor());
     canvas.drawRect(racket.getLeft(), racket.getTop(), racket.getRight(), racket.getBottom(), paint);
     redraw();
@@ -94,13 +112,32 @@ public class CanvasView extends View implements ICanvasView, Callback
   @Override
   public void drawBall(Ball ball)
   {
-    paint.setStyle(Style.FILL); // заполнение
     paint.setColor(ball.getColor());
+    paint.setStyle(Style.FILL_AND_STROKE); // обводка и заполнение
+    paint.setStrokeWidth(STROKE_WIDTH);
     canvas.drawCircle(ball.getX(), ball.getY(), Ball.RADIUS, paint);
     redraw();
   }
   
   // метод интерфейса ICanvasView
+  @Override
+  public void drawScore(String text, Point position, int color)
+  {
+    paint.setTextAlign(Align.CENTER);
+    paint.setTextSize(SCORE_TEXT_SIZE);
+    paint.setColor(GameController.WHITE_COLOR);
+    paint.setStyle(Style.STROKE); // обводка
+    paint.setStrokeWidth(STROKE_WIDTH);
+    canvas.drawText(text, position.x, position.y, paint);
+    paint.setColor(color);
+    paint.setStyle(Style.FILL);   // заполнение
+    canvas.drawText(text, position.x, position.y, paint);
+    redraw();
+  }
+  
+  // метод интерфейса ICanvasView
+  // TODO - Добавить картинку
+  // TODO - увеличить шрифт
   @Override
   public void showMessage(String text)
   {
@@ -118,7 +155,7 @@ public class CanvasView extends View implements ICanvasView, Callback
   @Override
   public boolean onTouchEvent(MotionEvent motionEvent)
   {
-    // получаем координаты касания
+    // получаем координату X касания
     int x = (int) motionEvent.getX();
     
     if(motionEvent.getAction() == MotionEvent.ACTION_MOVE)

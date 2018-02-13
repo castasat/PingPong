@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">PingPong</string>
+    <string name="lose">Sorry, but you lose the game!</string>
+    <string name="player_wins">Congratulations! You have won the game!</string>
+    <string name="opponent_wins">It\'s a pity! You have lost the game!</string>
 </resources>

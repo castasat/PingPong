@@ -39,8 +39,27 @@ public class MainActivity extends AppCompatActivity
   @Override
   protected void onDestroy()
   {
-    if(canvasView.handler != null)
-      canvasView.handler.removeCallbacksAndMessages(null);
+    boolean retry = true;
+    if(canvasView != null)
+    {
+      canvasView.gameController.setRunning(false);
+      while (retry)
+      {
+        try
+        {
+          canvasView.gameController.worker.join();
+          if(canvasView.handler != null)
+          {
+            canvasView.handler.removeCallbacksAndMessages(null);
+          }
+          retry = false;
+        }
+        catch(InterruptedException e)
+        {
+          e.printStackTrace();
+        }
+      }
+    }
     super.onDestroy();
   }
 }

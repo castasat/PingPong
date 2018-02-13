@@ -1,5 +1,7 @@
 package com.openyogaland.denis.pingpong;
 
+import android.graphics.Point;
+
 // Interface to work with from GameManager
 interface ICanvasView
 {
@@ -10,6 +12,8 @@ interface ICanvasView
   void drawBall(Ball ball);
   
   void showMessage(String text);
+  
+  void drawScore(String text, Point position, int color);
   
   void redraw();
 }

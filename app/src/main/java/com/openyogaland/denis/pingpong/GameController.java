@@ -3,14 +3,18 @@ package com.openyogaland.denis.pingpong;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.os.Bundle;
-import android.os.Message;
 import android.view.Display;
 import android.view.WindowManager;
 
 // represents Controller of the game and it's logic
 class GameController implements Runnable
 {
+  // constants
+  private final static int PLAYER_COLOR   = Color.BLUE;
+  private final static int OPPONENT_COLOR = Color.RED;
+          final static int WHITE_COLOR    = Color.WHITE;
+          final static int PLAYER_WINS    = 0;
+          final static int OPPONENT_WINS  = 1;
   
   // fields
   private CanvasView canvasView;        // View, on which we can draw something
@@ -18,9 +22,11 @@ class GameController implements Runnable
   private Ball       ball;              // ping-pong ball
   private Racket     opponentRacket;    // opponent racket
   private Racket     playerRacket;      // player racket
-  private Thread     worker;            // thread
+          Thread     worker;            // thread
   private int        playerScore;       // счёт игрока
   private int        opponentScore;     // счёт оппонента
+  
+  private boolean    running = false;   // флаг запущенного потока
   
   // constructor
   GameController(CanvasView canvasView, Context context)
@@ -47,6 +53,7 @@ class GameController implements Runnable
     
       // starting thread
       worker = new Thread(this);
+      setRunning(true);
       worker.start();
     }
   }
@@ -78,8 +85,7 @@ class GameController implements Runnable
   // opponent racket initialization
   private void initOpponentRacket()
   {
-    int opponentColor = Color.RED;
-    opponentRacket = new Racket(table.getInitOpponentRacketPosition(), opponentColor);
+    opponentRacket = new Racket(table.getInitOpponentRacketPosition(), OPPONENT_COLOR);
 
     // устанавливаем случайно флаг направления начального движения ракетки оппонента
     opponentRacket.isMovingLeft = getRandomInt(0, 1) == 0;
@@ -88,22 +94,26 @@ class GameController implements Runnable
   // player racket initialization
   private void initPlayerRacket()
   {
-    int playerColor = Color.BLUE;
-    playerRacket = new Racket(table.getInitPlayerRacketPosition(), playerColor);
+    playerRacket = new Racket(table.getInitPlayerRacketPosition(), PLAYER_COLOR);
   }
   
   // ping-pong ball initialization
   private void initBall()
   {
-    int ballColor = Color.WHITE;
-    ball = new Ball(table.getInitBallPosition(), ballColor);
+    ball = new Ball(table.getInitBallPosition(), WHITE_COLOR);
   }
   
   // this method draws game scene on CanvasView
   void onDraw()
   {
     canvasView.drawTable(table.getScreenWidth(), table.getScreenHeight(), Table.BORDER_MARGIN,
-        Table.BORDER_WIDTH, Color.WHITE);
+        Table.BORDER_WIDTH, WHITE_COLOR);
+    // отобразить счёт игрока
+    canvasView
+        .drawScore(String.valueOf(playerScore), table.getPlayerScoreTextPosition(), PLAYER_COLOR);
+    // отобразить счёт оппонента
+    canvasView.drawScore(String.valueOf(opponentScore), table.getOpponentScoreTextPosition(),
+        OPPONENT_COLOR);
     canvasView.drawRacket(playerRacket);
     canvasView.drawBall(ball);
     canvasView.drawRacket(opponentRacket);
@@ -145,12 +155,13 @@ class GameController implements Runnable
   @Override
   public void run()
   {
-    while (true)
+    while (running)
     {
       try
       {
+        // задержка
         int sleepTime = 30;
-        Thread.sleep(sleepTime); // задержка
+        Thread.sleep(sleepTime);
   
         // Передвигаем ракетку оппонента вправо или влево в зависимости от значения флага
         if(opponentRacket.isMovingLeft)
@@ -239,12 +250,7 @@ class GameController implements Runnable
               if (playerScore >= winningScore)
               {
                 // завершение игры
-                Message message = canvasView.handler.obtainMessage();
-                Bundle  bundle  = new Bundle();
-                bundle.putString("message", "Congratulations! You win the game!");
-                message.setData(bundle);
-                canvasView.handler.sendMessage(message);
-                
+                canvasView.handler.sendEmptyMessage(PLAYER_WINS);
                 gameOver();
               }
               else
@@ -274,12 +280,7 @@ class GameController implements Runnable
               if(opponentScore >= winningScore)
               {
                 // завершение игры
-                Message message = canvasView.handler.obtainMessage();
-                Bundle bundle = new Bundle();
-                bundle.putString("message", "Sorry, but you lose the game!");
-                message.setData(bundle);
-                canvasView.handler.sendMessage(message);
-                
+                canvasView.handler.sendEmptyMessage(OPPONENT_WINS);
                 gameOver();
               }
               else
@@ -300,6 +301,12 @@ class GameController implements Runnable
         worker = null;
       }
     }
+  }
+  
+  // stat running cycle
+  void setRunning(boolean running)
+  {
+    this.running = running;
   }
   
   // reinitialize ball and scores at the end of the game
