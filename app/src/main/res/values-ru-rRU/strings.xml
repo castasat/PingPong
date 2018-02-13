@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Настольный Теннис</string>
+    <string name="player_wins">Поздравляем! Вы выиграли!</string>
+    <string name="opponent_wins">К сожалению, вы проиграли!</string>
+</resources>

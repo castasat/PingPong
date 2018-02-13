@@ -136,8 +136,6 @@ public class CanvasView extends View implements ICanvasView, Callback
   }
   
   // метод интерфейса ICanvasView
-  // TODO - Добавить картинку
-  // TODO - увеличить шрифт
   @Override
   public void showMessage(String text)
   {
